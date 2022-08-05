@@ -1,0 +1,29 @@
+{
+    "GDB-linux": "gdb",
+    "C-linux": "gcc",
+    "CPP-linux": "g++",
+    "S-linux": "as",
+    "LD-linux": "g++",
+
+    "GDB-darwin": "gdb",
+    "C-darwin": "gcc",
+    "CPP-darwin": "g++",
+    "S-darwin": "as",
+    "LD-darwin": "g++",
+
+    "GDB-windows":"${appPath}/${os}/x86/bin/gdb${executableExt}",
+    "C-windows":"${appPath}/${os}/x86/bin/gcc${executableExt}",
+    "CPP-windows":"${appPath}/${os}/x86/bin/g++${executableExt}",
+    "S-windows":"${appPath}/${os}/x86/bin/as${executableExt}",
+    "LD-windows":"${appPath}/${os}/x86/bin/g++${executableExt}",
+
+    "ADDR2LINE-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-addr2line${executableExt}",
+    "GDB-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-gdb${executableExt}",
+    "C-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-gcc${executableExt}",
+    "CPP-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-g++${executableExt}",
+    "S-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-as${executableExt}",
+
+    "LD-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-gcc${executableExt}",
+    "ELF2BIN-Pokitto":"${appPath}/${os}/arm/bin/arm-none-eabi-objcopy${executableExt}",
+    "EMU-Pokitto":"${appPath}/${os}/PokittoEmu${executableExt}"
+}
