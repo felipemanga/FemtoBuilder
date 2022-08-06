@@ -36,7 +36,7 @@ public:
                 continue;
             }
             auto extension = toupper(childPath.extension());
-            if (extension.size() > 1) {
+            if (extension.size() > 1 && extension != ".LD") {
                 std::string ext = extension.c_str() + 1;
                 if (auto compiler = App::get().var(ext + "-" + target)) {
                     auto job = std::make_shared<Job>();
@@ -100,8 +100,8 @@ public:
                 std::vector<std::string> flags;
                 for (auto& dir : includeDirectories)
                     flags.push_back(quote("-I" + dir));
-
-                auto it = project.find(job->ext + "Flags");
+                std::string ext = job->ext == "C" ? "C" : "CPP";
+                auto it = project.find(ext + "Flags");
                 if (it != project.end() && it->is_object()) {
                     auto& flagBlock = *it;
                     it = flagBlock.find(target);
@@ -144,6 +144,7 @@ public:
             if (job->errorCode != 0) {
                 std::cout << "\n\n" << job->compiler << "\nERROR: " << job->error << std::endl;
                 error(std::to_string(job->errorCode));
+                exit(1);
             }
         });
 
