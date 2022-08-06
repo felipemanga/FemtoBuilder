@@ -122,9 +122,9 @@ public:
 
     std::string normalize(const std::string& src) override {
         std::string out = src;
-        std::regex exp{"\\$\\{[a-zA-Z0-9]+\\}"};
+        std::regex exp{"\\$\\{[^{}]+\\}"};
         int offset = 0;
-        for (std::sregex_iterator it{out.begin(), out.end(), exp}; it != std::sregex_iterator{}; ++it) {
+        for (std::sregex_iterator it{src.begin(), src.end(), exp}; it != std::sregex_iterator{}; ++it) {
             std::string key{src.begin() + it->position() + 2, src.begin() + it->position() + it->length() - 1};
             auto value = var(key, "");
             out.replace(it->position() + offset, it->length(), value);
@@ -181,7 +181,6 @@ public:
         if (!projectPath)
             vars["projectPath"] = root;
         vars["projectName"] = root.filename();
-
         return project;
     }
 };
