@@ -12,6 +12,7 @@ class AppImpl : public App {
     Path root;
     JSON project;
     std::unordered_map<std::string, std::string> vars;
+    std::unordered_multimap<std::string, std::string> lists;
 
 public:
     AppImpl() {
@@ -104,6 +105,20 @@ public:
         for (auto& entry : vars) {
             std::cout << entry.first << " = " << entry.second << std::endl;
         }
+    }
+
+    std::vector<std::string> list(const std::string& key) override {
+        std::vector<std::string> ret;
+        auto range = lists.equal_range(key);
+        for (auto it = range.first; it != range.second; ++it) {
+            ret.push_back(it->second);
+        }
+        // info("List " + key + " length " + std::to_string(ret.size()));
+        return ret;
+    }
+
+    void addToList(const std::string& key, const std::string& value) override {
+        lists.insert({key, value});
     }
 
     void setVar(const std::string& key, const std::string& value) override {

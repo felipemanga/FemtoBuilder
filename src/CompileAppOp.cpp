@@ -30,11 +30,13 @@ public:
                 error("Invalid pipeline step " + stepName);
                 return;
             }
-            app.verbose("Compile step " + stepName);
+            info("Compile step " + stepName);
             if (!step->run()) {
+                warn("Failed compile step " + stepName);
                 return;
             }
         }
+        info("Done");
     }
 
     std::vector<std::string> loadPipeline(JSON& project) {

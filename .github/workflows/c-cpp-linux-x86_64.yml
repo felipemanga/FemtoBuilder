@@ -1,0 +1,24 @@
+name: Linux x64
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: make
+      run: make
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: FPB-development-linux-x86_64
+        path: FPB

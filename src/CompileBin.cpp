@@ -1,10 +1,6 @@
 #include "App.hpp"
 #include "BuildStep.hpp"
-#include "Task.hpp"
 #include "Shell.hpp"
-
-#include <filesystem>
-#include <regex>
 
 static class CompileBin : public BuildStep {
 public:
@@ -14,39 +10,41 @@ public:
         auto& app = App::get();
         auto& project = app.getProject();
         auto target = app.var("target", "");
-
+        auto objdump = App::get().var("ELF2BIN-" + target, "g++");
         std::vector<std::string> flags;
-        auto it = project.find("ELF2BINFlags");
-        if (it != project.end() && it->is_object()) {
+
+        if (auto it = project.find("ELF2BINFlags"); it != project.end() && it->is_object()) {
             auto& flagBlock = *it;
             it = flagBlock.find(target);
             if (it != flagBlock.end() && it->is_array()) {
                 for (auto& entry : *it) {
-                    if (entry.is_string())
-                        flags.push_back(quote(entry));
+                    if (!entry.is_string())
+                        continue;
+                    flags.push_back(quote(app.normalize(entry)));
                 }
             }
             it = flagBlock.find("RELEASE");
             if (it != flagBlock.end() && it->is_array()) {
                 for (auto& entry : *it) {
                     if (entry.is_string())
-                        flags.push_back(quote(entry));
+                        flags.push_back(quote(app.normalize(entry)));
                 }
             }
             it = flagBlock.find("ALL");
             if (it != flagBlock.end() && it->is_array()) {
                 for (auto& entry : *it) {
                     if (entry.is_string())
-                        flags.push_back(quote(entry));
+                        flags.push_back(quote(app.normalize(entry)));
                 }
             }
         }
-        auto compiler = App::get().normalize("${ELF2BIN-" + target + "} " + join(flags, " "));
-        auto errorCode = shell(compiler);
+
+        std::string stdout;
+        auto cmdline = quote(app.normalize(objdump)) + " " + join(flags, " ");
+        info(cmdline);
+        auto errorCode = shell(cmdline, [&](const char* str) {stdout += str;});
         if (errorCode != 0) {
-            std::cout << "\n\n" << compiler << std::endl;
-            error(std::to_string(errorCode));
-            exit(1);
+            error(stdout);
         }
 
         return true;

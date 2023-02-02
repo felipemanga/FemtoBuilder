@@ -18,6 +18,7 @@ public:
         std::string ext;
         std::string compiler;
         std::string error;
+        std::string object;
     };
     std::vector<std::shared_ptr<Job>> jobs;
     std::vector<std::string> includeDirectories;
@@ -36,17 +37,19 @@ public:
                 continue;
             }
             auto extension = toupper(childPath.extension());
-            if (extension.size() > 1 && extension != ".LD") {
-                std::string ext = extension.c_str() + 1;
-                if (auto compiler = App::get().var(ext + "-" + target)) {
-                    auto job = std::make_shared<Job>();
-                    job->compiler = App::get().normalize(*compiler);
-                    job->path = childPath;
-                    job->ext = ext;
-                    jobs.push_back(job);
+            if (extension.empty() || extension == ".LD") {
+                continue;
+            }
+
+            std::string ext = extension.c_str() + 1;
+            if (auto compiler = App::get().var(ext + "-" + target)) {
+                auto job = std::make_shared<Job>();
+                job->compiler = App::get().normalize(*compiler);
+                job->path = childPath;
+                job->ext = ext;
+                jobs.push_back(job);
                 // } else {
                 //     App::get().verbose("No compiler for " + ext + "-" + target);
-                }
             }
         }
         includeDirectories.push_back(path);
@@ -78,7 +81,7 @@ public:
                                 recurse = lib;
                             }
                             if (recurse.empty()) {
-                                std::cout << "Ignoring bad lib entry: " << lib << std::endl;
+                                warn("Ignoring bad lib entry: " + std::string{lib});
                                 continue;
                             }
                             recurse = app.normalize(recurse);
@@ -95,47 +98,49 @@ public:
 
         TaskManager<std::shared_ptr<Job>, 4> taskMan;
 
+        int objId = 1;
+
         for (auto& job : jobs) {
-            taskMan.add([job, &project, this]{
+            taskMan.add([job, &project, &app, this, objId=objId++]{
                 std::vector<std::string> flags;
                 for (auto& dir : includeDirectories)
                     flags.push_back(quote("-I" + dir));
-                std::string ext = job->ext == "C" ? "C" : "CPP";
-                auto it = project.find(ext + "Flags");
+                auto it = project.find(job->ext + "Flags");
                 if (it != project.end() && it->is_object()) {
                     auto& flagBlock = *it;
                     it = flagBlock.find(target);
                     if (it != flagBlock.end() && it->is_array()) {
                         for (auto& entry : *it) {
                             if (entry.is_string())
-                                flags.push_back(entry);
+                                flags.push_back(quote(app.normalize(entry)));
                         }
                     }
                     it = flagBlock.find("RELEASE");
                     if (it != flagBlock.end() && it->is_array()) {
                         for (auto& entry : *it) {
                             if (entry.is_string())
-                                flags.push_back(entry);
+                                flags.push_back(quote(app.normalize(entry)));
                         }
                     }
                     it = flagBlock.find("ALL");
                     if (it != flagBlock.end() && it->is_array()) {
                         for (auto& entry : *it) {
                             if (entry.is_string())
-                                flags.push_back(entry);
+                                flags.push_back(quote(app.normalize(entry)));
                         }
                     }
                 }
 
+                job->object = "build_" + std::to_string(objId) + ".o";
                 job->compiler = join({
                             job->compiler,
                             quote(job->path.string()),
                             join(flags, " "),
-                            "-o", "build_" + job->path.filename().string() + ".o"
+                            "-o", quote(job->object)
                     }, " ");
                 // std::cout << job->compiler << std::endl;
                 job->errorCode = shell(job->compiler, [&](const char* str) {job->error += str;});
-                std::cout << job->path.filename().string() << " " << job->errorCode << std::endl;
+                App::get().verbose(job->path.filename().string() + " return code: " + std::to_string(job->errorCode));
                 return job;
             });
         }
@@ -145,6 +150,9 @@ public:
                 std::cout << "\n\n" << job->compiler << "\nERROR: " << job->error << std::endl;
                 error(std::to_string(job->errorCode));
                 exit(1);
+            } else {
+                App::get().addToList("objects", job->object);
+                info(job->path.string());
             }
         });
 

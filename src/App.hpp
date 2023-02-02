@@ -17,6 +17,10 @@ public:
     // vars
     virtual bool verbose() = 0;
     virtual bool verbose(const std::string& text) = 0;
+
+    virtual std::vector<std::string> list(const std::string& key) = 0;
+    virtual void addToList(const std::string& key, const std::string& value) = 0;
+
     virtual void setVar(const std::string& key, const std::string& value) = 0;
     virtual std::string var(const std::string& key, const std::string& defaultValue) = 0;
     virtual std::optional<std::string> var(const std::string& key) = 0;
@@ -36,4 +40,8 @@ inline void error(const std::string& str) {
 
 inline void warn(const std::string& str) {
     std::cerr << str << std::endl;
+}
+
+inline void info(const std::string& str) {
+    std::cout << str << std::endl;
 }

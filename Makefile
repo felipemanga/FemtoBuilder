@@ -16,22 +16,8 @@ ifeq ($(OS),Windows_NT)
     PKGCONFIG = pkg-config
     BINARY += .exe
 
-    LN_FLAGS += -lv8 -lv8_libplatform
-    CPP_FLAGS += -DSCRIPT_ENGINE_V8
     CPP_FLAGS += -D__WINDOWS__
-
-    LN_FLAGS += -lopengl32
-    LN_FLAGS += -lglew32
-
-    LN_FLAGS += -lole32
-    LN_FLAGS += -lws2_32
-    LN_FLAGS += -lcrypt32
-    ifeq ($(DEBUG),true)
-        LN_FLAGS += -mconsole
-    else
-        LN_FLAGS += -mwindows
-    endif
-
+    LN_FLAGS += -mconsole
 else
     CC = gcc
     CXX = g++

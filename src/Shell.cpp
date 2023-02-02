@@ -13,7 +13,7 @@ int shell(const std::string& cmd) {
           result = pclose(file);
           result = WEXITSTATUS(result);
       };
-      std::unique_ptr<FILE, decltype(onClose)> pipe(popen(cmd.c_str(), "r"), onClose);
+      std::unique_ptr<FILE, decltype(onClose)> pipe(popen((cmd + " 2>&1").c_str(), "r"), onClose);
       if (pipe) {
           std::cout << std::unitbuf;
           char buffer[2];
@@ -33,7 +33,7 @@ int shell(const std::string& cmd, const std::function<void(const char*)>& cb) {
           result = pclose(file);
           result = WEXITSTATUS(result);
       };
-      std::unique_ptr<FILE, decltype(onClose)> pipe(popen(cmd.c_str(), "r"), onClose);
+      std::unique_ptr<FILE, decltype(onClose)> pipe(popen((cmd + " 2>&1").c_str(), "r"), onClose);
       if (pipe) {
           char buffer[1024];
           while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {

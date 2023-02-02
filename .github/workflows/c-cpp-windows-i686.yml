@@ -1,0 +1,33 @@
+name: Windows x86
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW32
+        release: false
+        update: false
+        install: >-
+          base-devel
+          git
+          mingw-w64-i686-gcc
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - shell: msys2 {0}
+      run: make
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: fpb-development-windows-i686
+        path: FPB.exe
