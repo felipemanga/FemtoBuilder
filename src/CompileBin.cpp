@@ -39,12 +39,12 @@ public:
             }
         }
 
-        std::string stdout;
+        std::string out;
         auto cmdline = quote(app.normalize(objdump)) + " " + join(flags, " ");
         info(cmdline);
-        auto errorCode = shell(cmdline, [&](const char* str) {stdout += str;});
+        auto errorCode = shell(cmdline, [&](const char* str) {out += str;});
         if (errorCode != 0) {
-            error(stdout);
+            error(out);
         }
 
         return true;

@@ -44,12 +44,12 @@ public:
             *it = join(app.list("objects"), " ");
         }
 
-        std::string stdout;
+        std::string out;
         auto cmdline = quote(app.normalize(linker)) + " " + app.normalize(join(flags, " "));
         info(cmdline);
-        auto errorCode = shell(cmdline, [&](const char* str) {stdout += str;});
+        auto errorCode = shell(cmdline, [&](const char* str) {out += str;});
         if (errorCode != 0) {
-            error(stdout);
+            error(out);
             exit(1);
         }
 
