@@ -2,9 +2,9 @@ name: MacOS Intel
 
 on:
   push:
-    branches: [ development ]
+    branches: [ master ]
   pull_request:
-    branches: [ development ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -20,5 +20,5 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: fpb-development-macos-11-x86_64
+        name: fpb-master-macos-11-x86_64
         path: FPB

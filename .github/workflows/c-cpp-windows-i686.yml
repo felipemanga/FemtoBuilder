@@ -2,9 +2,9 @@ name: Windows x86
 
 on:
   push:
-    branches: [ development ]
+    branches: [ master ]
   pull_request:
-    branches: [ development ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -29,5 +29,5 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: fpb-development-windows-i686
+        name: fpb-master-windows-i686
         path: FPB.exe
