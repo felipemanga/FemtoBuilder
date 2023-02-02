@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <optional>
+
 #include "json.hpp"
 #include "types.hpp"
 
